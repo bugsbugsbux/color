@@ -25,7 +25,7 @@ Options:
         --unicode       starts the escape sequence with "\x001b["
 
 Commands:
-    Forground colors are set with one of the following commands
+    Foreground colors are set with one of the following commands
         red
         green
         blue
@@ -47,7 +47,7 @@ Commands:
         or an 24bit color as RGB hex number triplet separated with
         arbitrary symbols and prefixed with "rgb-" or "hex-".
 
-    Background colors are simply forground colors prefixed with "bg-".
+    Background colors are simply foreground colors prefixed with "bg-".
 
     The following modifier commands are available:
         bold strong fat
@@ -200,7 +200,7 @@ color() {
             reset-strike|reset-struck|reset-strikethrough) _mod_reset strike 29 || return $? ;; # \e[29m
 
             # The following option does not have a variant only named "default" because this sounds like
-            # resetting everything to default, but it only resets the forground color!
+            # resetting everything to default, but it only resets the foreground color!
             reset-fg|fg-default) # \e[39m
                 if $only_options; then return $ONLY_RESET_ALL_ALLOWED_ERR; fi
                 if [[ -n "$fg" ]]; then return $COLOR_SET_AND_RESET_ERR; fi
