@@ -199,6 +199,8 @@ color() {
             strike|struck|strikethrough) _mod_set strike 9 || return $? ;; # \e[9m
             reset-strike|reset-struck|reset-strikethrough) _mod_reset strike 29 || return $? ;; # \e[29m
 
+            # The following option does not have a variant only named "default" because this sounds like
+            # resetting everything to default, but it only resets the forground color!
             reset-fg|fg-default) # \e[39m
                 if $only_options; then return $ONLY_RESET_ALL_ALLOWED_ERR; fi
                 if [[ -n "$fg" ]]; then return $COLOR_SET_AND_RESET_ERR; fi
