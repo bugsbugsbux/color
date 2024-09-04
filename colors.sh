@@ -296,7 +296,7 @@ color() {
             rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number -> needs to be converted
                 return $NOT_IMPLEMENTED_ERR
             ;;
-            bg-rgb-*|bg-hex-*) #\e[38;2;R;G;Bm # user provides hex number -> needs to be converted
+            bg-rgb-*|bg-hex-*) #\e[48;2;R;G;Bm # user provides hex number -> needs to be converted
                 return $NOT_IMPLEMENTED_ERR
             ;;
 
