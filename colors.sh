@@ -293,11 +293,28 @@ color() {
                 else return $COLOR_ERR
                 fi
             ;;
-            rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number -> needs to be converted
-                return $NOT_IMPLEMENTED_ERR
+            rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number
+                local -i R G B
+                local COLORS="${arg#*-}"
+                if [[ ${#COLORS} == 6 && "$COLORS" == +([0-9a-fA-F]) ]]; then
+                    R="0x${COLORS:0:2}"
+                    G="0x${COLORS:2:2}"
+                    B="0x${COLORS:4:2}"
+                    _set_color fg "38;2;$R;$G;$B" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
-            bg-rgb-*|bg-hex-*) #\e[48;2;R;G;Bm # user provides hex number -> needs to be converted
-                return $NOT_IMPLEMENTED_ERR
+            bg-rgb-*|bg-hex-*) #\e[48;2;R;G;Bm # user provides hex number
+                local -i R G B
+                local COLORS="${arg#*-}" # only removes up to the first -
+                COLORS="${COLORS#*-}"
+                if [[ ${#COLORS} == 6 && "$COLORS" == +([0-9a-fA-F]) ]]; then
+                    R="0x${COLORS:0:2}"
+                    G="0x${COLORS:2:2}"
+                    B="0x${COLORS:4:2}"
+                    _set_color bg "48;2;$R;$G;$B" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
 
             *) return $UNKNOWN_ARG_ERR
