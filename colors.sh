@@ -5,6 +5,7 @@ ASSERTION_ERR=10 # bug in the program; not a user error
 NOT_IMPLEMENTED_ERR=20 # given command or option is not implemented yet
 ARG_ERR=30 # generic error due to the given (or missing) arguments
 UNKNOWN_ARG_ERR=31 # a given argument is invalid: it is not known
+COLOR_ERR=32 # given color does not follow expected format
 OPT_COMBI_ERR=40 # given options cannot be used in same invocation
 CMD_COMBI_ERR=50 # given commands cannot be used in same invocation
 MOD_SET_AND_RESET_ERR=51 # must not set and reset same modifier in same invocation
@@ -79,6 +80,7 @@ Error codes:
         20  given command or option is not implemented yet
         30  generic error due to the given (or missing) arguments
         31  a given argument is invalid: it is not known
+        32  given color does not follow expected format
         40  given options cannot be used in same invocation
         50  given commands cannot be used in same invocation
         51  must not set and reset same modifier in same invocation
@@ -254,12 +256,18 @@ color() {
 
             8bit-*|256-*) # \e[38;5;COLORm
                 local COLOR="${arg#*-}"
-                _set_color fg "38;5;$COLOR" || return $?
+                if [[ "$COLOR" == +([0-9]) ]] && ((COLOR >= 0 && COLOR <= 255)); then
+                    _set_color fg "38;5;$COLOR" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
             bg-8bit-*|bg-256-*) # \e[48;5;COLORm
                 local COLOR="${arg#*-}" # only removes up to first -
                 COLOR="${COLOR#*-}"
-                _set_color bg "48;5;$COLOR" || return $?
+                if [[ "$COLOR" == +([0-9]) ]] && ((COLOR >= 0 && COLOR <= 255)); then
+                    _set_color bg "48;5;$COLOR" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
 
             tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
