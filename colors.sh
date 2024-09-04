@@ -132,6 +132,10 @@ _set_prefix() {
 
 color() {
 
+    # pattern for an integer: leading zeros not allowed unless all zeros
+    # why? number staring with zero is interpreted as octal number
+    local INT='@(*(0)|+([1-9])*([0-9]))'
+
     local fg bg modifiers
     local prefix='\e['
     local suffix='m'
@@ -256,7 +260,7 @@ color() {
 
             8bit-*|256-*) # \e[38;5;COLORm
                 local COLOR="${arg#*-}"
-                if [[ "$COLOR" == +([0-9]) ]] && ((COLOR >= 0 && COLOR <= 255)); then
+                if [[ "$COLOR" == $INT ]] && ((COLOR >= 0 && COLOR <= 255)); then
                     _set_color fg "38;5;$COLOR" || return $?
                 else return $COLOR_ERR
                 fi
@@ -264,7 +268,7 @@ color() {
             bg-8bit-*|bg-256-*) # \e[48;5;COLORm
                 local COLOR="${arg#*-}" # only removes up to first -
                 COLOR="${COLOR#*-}"
-                if [[ "$COLOR" == +([0-9]) ]] && ((COLOR >= 0 && COLOR <= 255)); then
+                if [[ "$COLOR" == $INT ]] && ((COLOR >= 0 && COLOR <= 255)); then
                     _set_color bg "48;5;$COLOR" || return $?
                 else return $COLOR_ERR
                 fi
@@ -273,7 +277,7 @@ color() {
             tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
                 local COLORS="${arg#*-}"
                 COLORS="${COLORS//[^0-9]/;}"
-                if [[ "$COLORS" == +([0-9])\;+([0-9])\;+([0-9]) ]] && ((
+                if [[ "$COLORS" == $INT\;$INT\;$INT ]] && ((
                     "${COLORS//;/"<=255 && "}<=255" &&
                     "${COLORS//;/">=0 && "}>=0"
                 )) then
@@ -285,7 +289,7 @@ color() {
                 local COLORS="${arg#*-}" # only removes up to first -
                 COLORS="${COLORS#*-}"
                 COLORS="${COLORS//[^0-9]/;}"
-                if [[ "$COLORS" == +([0-9])\;+([0-9])\;+([0-9]) ]] && ((
+                if [[ "$COLORS" == $INT\;$INT\;$INT ]] && ((
                     "${COLORS//;/"<=255 && "}<=255" &&
                     "${COLORS//;/">=0 && "}>=0"
                 )) then
