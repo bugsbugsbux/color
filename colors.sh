@@ -17,6 +17,7 @@ HELPTEXT='USAGE: color [options] [commands]
 Options:
     -h | --help     print this help text and exit
     -p | --prompt   appends "\]" (useful in bash prompts)
+    -n | --newline  prints the escape sequence followed by a newline
 
     Only one of the following options may be used, if none is used
     the escape sequence starts with "\e[":
