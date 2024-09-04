@@ -259,64 +259,64 @@ color() {
             bg-hi-cyan) _set_color bg 106 || return $? ;; # \e[106m
 
             8bit-*|256-*) # \e[38;5;COLORm
-                local COLOR="${arg#*-}"
-                if [[ "$COLOR" == $INT ]] && ((COLOR >= 0 && COLOR <= 255)); then
-                    _set_color fg "38;5;$COLOR" || return $?
+                local color="${arg#*-}"
+                if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
+                    _set_color fg "38;5;$color" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
             bg-8bit-*|bg-256-*) # \e[48;5;COLORm
-                local COLOR="${arg#*-}" # only removes up to first -
-                COLOR="${COLOR#*-}"
-                if [[ "$COLOR" == $INT ]] && ((COLOR >= 0 && COLOR <= 255)); then
-                    _set_color bg "48;5;$COLOR" || return $?
+                local color="${arg#*-}" # only removes up to first -
+                color="${color#*-}"
+                if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
+                    _set_color bg "48;5;$color" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
 
             tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
-                local COLORS="${arg#*-}"
-                COLORS="${COLORS//[^0-9]/;}"
-                if [[ "$COLORS" == $INT\;$INT\;$INT ]] && ((
-                    "${COLORS//;/"<=255 && "}<=255" &&
-                    "${COLORS//;/">=0 && "}>=0"
+                local colors="${arg#*-}"
+                colors="${colors//[^0-9]/;}"
+                if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
+                    "${colors//;/"<=255 && "}<=255" &&
+                    "${colors//;/">=0 && "}>=0"
                 )) then
-                    _set_color fg "38;2;$COLORS" || return $?
+                    _set_color fg "38;2;$colors" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
             bg-tc-*|bg-24bit-*) #\e[48;2;R;G;Bm # user provides r-g-b decimal number triplet
-                local COLORS="${arg#*-}" # only removes up to first -
-                COLORS="${COLORS#*-}"
-                COLORS="${COLORS//[^0-9]/;}"
-                if [[ "$COLORS" == $INT\;$INT\;$INT ]] && ((
-                    "${COLORS//;/"<=255 && "}<=255" &&
-                    "${COLORS//;/">=0 && "}>=0"
+                local colors="${arg#*-}" # only removes up to first -
+                colors="${colors#*-}"
+                colors="${colors//[^0-9]/;}"
+                if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
+                    "${colors//;/"<=255 && "}<=255" &&
+                    "${colors//;/">=0 && "}>=0"
                 )) then
-                    _set_color bg "48;2;$COLORS" || return $?
+                    _set_color bg "48;2;$colors" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
             rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number
-                local -i R G B
-                local COLORS="${arg#*-}"
-                if [[ ${#COLORS} == 6 && "$COLORS" == +([0-9a-fA-F]) ]]; then
-                    R="0x${COLORS:0:2}"
-                    G="0x${COLORS:2:2}"
-                    B="0x${COLORS:4:2}"
-                    _set_color fg "38;2;$R;$G;$B" || return $?
+                local -i r g b
+                local colors="${arg#*-}"
+                if [[ ${#colors} == 6 && "$colors" == +([0-9a-fA-F]) ]]; then
+                    r="0x${colors:0:2}"
+                    g="0x${colors:2:2}"
+                    b="0x${colors:4:2}"
+                    _set_color fg "38;2;$r;$g;$b" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
             bg-rgb-*|bg-hex-*) #\e[48;2;R;G;Bm # user provides hex number
-                local -i R G B
-                local COLORS="${arg#*-}" # only removes up to the first -
-                COLORS="${COLORS#*-}"
-                if [[ ${#COLORS} == 6 && "$COLORS" == +([0-9a-fA-F]) ]]; then
-                    R="0x${COLORS:0:2}"
-                    G="0x${COLORS:2:2}"
-                    B="0x${COLORS:4:2}"
-                    _set_color bg "48;2;$R;$G;$B" || return $?
+                local -i r g b
+                local colors="${arg#*-}" # only removes up to the first -
+                colors="${colors#*-}"
+                if [[ ${#colors} == 6 && "$colors" == +([0-9a-fA-F]) ]]; then
+                    r="0x${colors:0:2}"
+                    g="0x${colors:2:2}"
+                    b="0x${colors:4:2}"
+                    _set_color bg "48;2;$r;$g;$b" || return $?
                 else return $COLOR_ERR
                 fi
             ;;
