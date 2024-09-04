@@ -252,8 +252,15 @@ color() {
             bg-cyan) _set_color bg 46 || return $? ;; # \e[46m
             bg-hi-cyan) _set_color bg 106 || return $? ;; # \e[106m
 
-            8bit-*|256-*) _set_color fg "38;5;${arg#*-}" || return $? ;; # \e[38;5;COLORm
-            bg-8bit-*|bg-256-*) _set_color bg "48;5;${arg#*-}" || return $? ;; # \e[48;5;COLORm
+            8bit-*|256-*) # \e[38;5;COLORm
+                local COLOR="${arg#*-}"
+                _set_color fg "38;5;$COLOR" || return $?
+            ;;
+            bg-8bit-*|bg-256-*) # \e[48;5;COLORm
+                local COLOR="${arg#*-}" # only removes up to first -
+                COLOR="${COLOR#*-}"
+                _set_color bg "48;5;$COLOR" || return $?
+            ;;
 
             tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
                 return $NOT_IMPLEMENTED_ERR
