@@ -63,7 +63,7 @@ Commands:
 
     To undo modifiers prefix them with "reset-".
 
-    To reset fg- or bg- colors to their default, use
+    To reset fg- or bg-colors to their default, use
         reset-fg
         reset-bg
     or
