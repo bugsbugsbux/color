@@ -134,7 +134,7 @@ color() {
 
     # pattern for an integer: leading zeros not allowed unless all zeros
     # why? number staring with zero is interpreted as octal number
-    local INT='@(*(0)|+([1-9])*([0-9]))'
+    local INT='@(+(0)|+([1-9])*([0-9]))'
 
     local fg bg modifiers
     local prefix='\e['
