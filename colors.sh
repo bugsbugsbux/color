@@ -116,7 +116,7 @@ _mod_reset() {
 }
 
 _set_color() {
-    if [[ "$1" != fg && "$1" != bg ]]; then return $ASSERTION_ERR; fi
+    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
     if $only_options; then return $ONLY_RESET_ALL_ALLOWED_ERR; fi
 
     local -n var="$1"
@@ -303,7 +303,7 @@ color() {
             rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number
                 local -i r g b
                 local colors="${arg#*-}"
-                if [[ ${#colors} == 6 && "$colors" == +([0-9a-fA-F]) ]]; then
+                if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
                     r="0x${colors:0:2}"
                     g="0x${colors:2:2}"
                     b="0x${colors:4:2}"
@@ -315,7 +315,7 @@ color() {
                 local -i r g b
                 local colors="${arg#*-}" # only removes up to the first -
                 colors="${colors#*-}"
-                if [[ ${#colors} == 6 && "$colors" == +([0-9a-fA-F]) ]]; then
+                if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
                     r="0x${colors:0:2}"
                     g="0x${colors:2:2}"
                     b="0x${colors:4:2}"
