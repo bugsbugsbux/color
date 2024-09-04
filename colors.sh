@@ -271,10 +271,27 @@ color() {
             ;;
 
             tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
-                return $NOT_IMPLEMENTED_ERR
+                local COLORS="${arg#*-}"
+                COLORS="${COLORS//[^0-9]/;}"
+                if [[ "$COLORS" == +([0-9])\;+([0-9])\;+([0-9]) ]] && ((
+                    "${COLORS//;/"<=255 && "}<=255" &&
+                    "${COLORS//;/">=0 && "}>=0"
+                )) then
+                    _set_color fg "38;2;$COLORS" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
             bg-tc-*|bg-24bit-*) #\e[48;2;R;G;Bm # user provides r-g-b decimal number triplet
-                return $NOT_IMPLEMENTED_ERR
+                local COLORS="${arg#*-}" # only removes up to first -
+                COLORS="${COLORS#*-}"
+                COLORS="${COLORS//[^0-9]/;}"
+                if [[ "$COLORS" == +([0-9])\;+([0-9])\;+([0-9]) ]] && ((
+                    "${COLORS//;/"<=255 && "}<=255" &&
+                    "${COLORS//;/">=0 && "}>=0"
+                )) then
+                    _set_color bg "48;2;$COLORS" || return $?
+                else return $COLOR_ERR
+                fi
             ;;
             rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number -> needs to be converted
                 return $NOT_IMPLEMENTED_ERR
