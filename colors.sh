@@ -198,7 +198,9 @@ color() {
             reset-blink|reset-blinking) _mod_reset blink 25 || return $? ;; # \e[25m
 
             invert|inverted|inverse|inversed|reverse|reversed) _mod_set invert 7 || return $? ;; # \e[7m
-            reset-invert|reset-inverted|reset-inverse|reset-inversed|reset-reverse|reset-reversed) _mod_reset invert 27 || return $? ;; # \e[27m
+            reset-invert|reset-inverted|reset-inverse|reset-inversed|reset-reverse|reset-reversed) # \e[27m
+                _mod_reset invert 27 || return $?
+            ;;
 
             hide|hidden|invisible) _mod_set hide 8 || return $? ;; # \e[8m
             reset-hide|reset-hidden|reset-invisible) _mod_reset hide 28 || return $? ;; # \e[28m
