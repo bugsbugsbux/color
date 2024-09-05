@@ -125,6 +125,53 @@ _set_color() {
     var="$code"
 }
 
+_set_8bit_color() {
+    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
+    local color="${arg#*-}"
+    if [[ bg == "$1" ]]; then color="${color#*-}"; fi
+    if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
+        if [[ fg == "$1" ]];
+        then _set_color fg "38;5;$color" || return $?
+        else _set_color bg "48;5;$color" || return $?
+        fi
+    else return $COLOR_ERR
+    fi
+}
+
+_set_24bit_color() {
+    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
+    local colors="${arg#*-}"
+    if [[ bg == "$1" ]]; then colors="${colors#*-}"; fi
+    colors="${colors//[^0-9]/;}"
+    if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
+        "${colors//;/"<=255 && "}<=255" &&
+        "${colors//;/">=0 && "}>=0"
+    )) then
+        if [[ fg == "$1" ]];
+        then _set_color fg "38;2;$colors" || return $?
+        else _set_color bg "48;2;$colors" || return $?
+        fi
+    else return $COLOR_ERR
+    fi
+}
+
+_set_rgb_hex_color() {
+    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
+    local -i r g b
+    local colors="${arg#*-}"
+    if [[ bg == "$1" ]]; then colors="${colors#*-}"; fi
+    if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
+        r="0x${colors:0:2}"
+        g="0x${colors:2:2}"
+        b="0x${colors:4:2}"
+        if [[ fg == "$1" ]];
+        then _set_color fg "38;2;$r;$g;$b" || return $?
+        else _set_color bg "48;2;$r;$g;$b" || return $?
+        fi
+    else return $COLOR_ERR
+    fi
+}
+
 _set_prefix() {
     if $no_prefix_options; then return $OPT_COMBI_ERR; fi
     no_prefix_options=true
@@ -261,68 +308,16 @@ color() {
             bg-cyan) _set_color bg 46 || return $? ;; # \e[46m
             bg-hi-cyan) _set_color bg 106 || return $? ;; # \e[106m
 
-            8bit-*|256-*) # \e[38;5;COLORm
-                local color="${arg#*-}"
-                if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
-                    _set_color fg "38;5;$color" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
-            bg-8bit-*|bg-256-*) # \e[48;5;COLORm
-                local color="${arg#*-}" # only removes up to first -
-                color="${color#*-}"
-                if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
-                    _set_color bg "48;5;$color" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
+            8bit-*|256-*) _set_8bit_color fg || return $? ;; # \e[38;5;COLORm
+            bg-8bit-*|bg-256-*) _set_8bit_color bg || return $? ;; # \e[48;5;COLORm
 
-            tc-*|24bit-*) #\e[38;2;R;G;Bm # user provides r-g-b decimal number triplet
-                local colors="${arg#*-}"
-                colors="${colors//[^0-9]/;}"
-                if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
-                    "${colors//;/"<=255 && "}<=255" &&
-                    "${colors//;/">=0 && "}>=0"
-                )) then
-                    _set_color fg "38;2;$colors" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
-            bg-tc-*|bg-24bit-*) #\e[48;2;R;G;Bm # user provides r-g-b decimal number triplet
-                local colors="${arg#*-}" # only removes up to first -
-                colors="${colors#*-}"
-                colors="${colors//[^0-9]/;}"
-                if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
-                    "${colors//;/"<=255 && "}<=255" &&
-                    "${colors//;/">=0 && "}>=0"
-                )) then
-                    _set_color bg "48;2;$colors" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
-            rgb-*|hex-*) #\e[38;2;R;G;Bm # user provides hex number
-                local -i r g b
-                local colors="${arg#*-}"
-                if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
-                    r="0x${colors:0:2}"
-                    g="0x${colors:2:2}"
-                    b="0x${colors:4:2}"
-                    _set_color fg "38;2;$r;$g;$b" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
-            bg-rgb-*|bg-hex-*) #\e[48;2;R;G;Bm # user provides hex number
-                local -i r g b
-                local colors="${arg#*-}" # only removes up to the first -
-                colors="${colors#*-}"
-                if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
-                    r="0x${colors:0:2}"
-                    g="0x${colors:2:2}"
-                    b="0x${colors:4:2}"
-                    _set_color bg "48;2;$r;$g;$b" || return $?
-                else return $COLOR_ERR
-                fi
-            ;;
+            # user provides r-g-b decimal number triplet
+            tc-*|24bit-*) _set_24bit_color fg || return $? ;; #\e[38;2;R;G;Bm
+            bg-tc-*|bg-24bit-*) _set_24bit_color bg || return $? ;; #\e[48;2;R;G;Bm
+
+            # user provides hex number
+            rgb-*|hex-*) _set_rgb_hex_color fg || return $? ;; #\e[38;2;R;G;Bm
+            bg-rgb-*|bg-hex-*) _set_rgb_hex_color bg || return $? ;; #\e[48;2;R;G;Bm
 
             *) return $UNKNOWN_ARG_ERR
         esac
