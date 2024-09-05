@@ -126,9 +126,10 @@ _set_color() {
 }
 
 _set_8bit_color() {
-    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
     local color="${arg#*-}"
-    if [[ bg == "$1" ]]; then color="${color#*-}"; fi
+    if [[ bg == "$1" ]]; then color="${color#*-}"
+    elif [[ fg != "$1" ]]; then return $ASSERTION_ERR
+    fi
     if [[ "$color" == $INT ]] && ((color >= 0 && color <= 255)); then
         if [[ fg == "$1" ]];
         then _set_color fg "38;5;$color" || return $?
@@ -139,9 +140,10 @@ _set_8bit_color() {
 }
 
 _set_24bit_color() {
-    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
     local colors="${arg#*-}"
-    if [[ bg == "$1" ]]; then colors="${colors#*-}"; fi
+    if [[ bg == "$1" ]]; then colors="${colors#*-}"
+    elif [[ fg != "$1" ]]; then return $ASSERTION_ERR
+    fi
     colors="${colors//[^0-9]/;}"
     if [[ "$colors" == $INT\;$INT\;$INT ]] && ((
         "${colors//;/"<=255 && "}<=255" &&
@@ -156,10 +158,11 @@ _set_24bit_color() {
 }
 
 _set_rgb_hex_color() {
-    if [[ fg != "$1" && bg != "$1" ]]; then return $ASSERTION_ERR; fi
     local -i r g b
     local colors="${arg#*-}"
-    if [[ bg == "$1" ]]; then colors="${colors#*-}"; fi
+    if [[ bg == "$1" ]]; then colors="${colors#*-}"
+    elif [[ fg != "$1" ]]; then return $ASSERTION_ERR
+    fi
     if [[ 6 == "${#colors}" && "$colors" == +([0-9a-fA-F]) ]]; then
         r="0x${colors:0:2}"
         g="0x${colors:2:2}"
