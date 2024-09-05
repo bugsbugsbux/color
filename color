@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #see: ./LICENSE
 
 #TODO: check on change: if number and description in $HELPTEXT match
@@ -348,3 +350,5 @@ color() {
     fi
 
 }
+
+color "$@"

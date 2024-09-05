@@ -3,8 +3,6 @@ See: ./LICENSE
 Examples:
 
 ```bash
-source ./colors.sh
-
 # colors from your colorscheme
 echo -e "$(
     color bold red bg-cyan
