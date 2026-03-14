@@ -20,3 +20,6 @@ echo -e "${R}R${G}G${B}B$X colors"
 ```
 
 For more features see `color --help` or the bash source code.
+
+To check whether your terminal supports truecolor or just because you
+want to see a rainbow, use: `./check-truecolor.sh`
